@@ -1,24 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+
+import Axios from "axios";
+
+import { Container } from "reactstrap";
+import Navbar from "./components/Navbar";
+import UserCard from "./components/UserCard";
 
 function App() {
+  const [users, setUsers] = useState([]);
+  const [isClicked, setClick] = useState(false);
+  const url = "https://reqres.in/api/users?page=1";
+  const fetchUsers = async () => {
+    const { data } = await Axios.get(url);
+    const user = data.data;
+    setUsers(user);
+  };
+  console.log(users[0]);
+  useEffect(() => {
+    fetchUsers();
+  }, [users]);
+
+  const showData = () => {
+    setClick(!isClicked);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="App">
+        <Navbar handleClick={showData} />
+        <Container>
+          {isClicked ? (
+            <div className="main">
+              {users.map((data) => {
+                return (
+                  <UserCard
+                    key={data?.id}
+                    lname={data?.first_name}
+                    fname={data?.last_name}
+                    email={data?.email}
+                    picUrl={data?.avatar}
+                  />
+                );
+              })}
+            </div>
+          ) : null}
+        </Container>
+      </div>
+    </>
   );
 }
 
